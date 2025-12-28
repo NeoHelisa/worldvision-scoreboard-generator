@@ -1,0 +1,48 @@
+import {ScoreboardTheme} from "../types";
+
+export const minimalTheme: ScoreboardTheme = {
+    id: 'minimal',
+    name: 'Minimal',
+    description: '',
+    colors: {
+        background: '#f8f9fa',
+        backgroundSecondary: '#e9ecef',
+        window: '#ffffff',
+        text: '#212529',
+        textSecondary: '#6c757d',
+        countryName: '#212529',
+        countryNameBg: '#f8f9fa',
+        pointsOverall: '#212529',
+        pointsOverallBg: '#e9ecef',
+        pointsHighlightBg: '#228be6',
+        pointsGained: '#2f9e44',
+        border: '#dee2e6',
+        accent: '#228be6',
+        first: '#fab005',
+        second: '#868e96',
+        third: '#e67700',
+        gotPoints: '#228be6',
+    },
+    typography: {
+        fontPrimary: "'Inter', sans-serif",
+        fontCountry: "'Inter', sans-serif",
+        fontPoints: "'Inter', sans-serif",
+        countryNameSize: '0.8rem',
+        pointsSize: '0.95rem',
+    },
+    spacing: {
+        itemGap: '6px',
+        columnGap: '40px',
+        padding: '32px',
+        borderRadius: '8px',
+        itemHeight: '40px',
+    },
+    effects: {
+        glow: false,
+        glowColor: 'transparent',
+        shadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+        windowShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+        itemHover: true,
+    },
+    assets: {},
+};

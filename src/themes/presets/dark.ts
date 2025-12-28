@@ -1,0 +1,48 @@
+import {ScoreboardTheme} from "../types";
+
+export const darkTheme: ScoreboardTheme = {
+    id: 'dark',
+    name: 'Dark',
+    description: '',
+    colors: {
+        background: '#121212',
+        backgroundSecondary: '#1e1e1e',
+        window: '#1e1e1e',
+        text: '#e0e0e0',
+        textSecondary: '#888888',
+        countryName: '#e0e0e0',
+        countryNameBg: '#2d2d2d',
+        pointsOverall: '#e0e0e0',
+        pointsOverallBg: '#2d2d2d',
+        pointsHighlightBg: '#bb86fc',
+        pointsGained: '#03dac6',
+        border: '#333333',
+        accent: '#bb86fc',
+        first: '#ffd700',
+        second: '#a0a0a0',
+        third: '#cd7f32',
+        gotPoints: '#03dac6',
+    },
+    typography: {
+        fontPrimary: "'Roboto', sans-serif",
+        fontCountry: "'Roboto', sans-serif",
+        fontPoints: "'Roboto Mono', monospace",
+        countryNameSize: '0.8rem',
+        pointsSize: '1rem',
+    },
+    spacing: {
+        itemGap: '8px',
+        columnGap: '28px',
+        padding: '24px',
+        borderRadius: '6px',
+        itemHeight: '42px',
+    },
+    effects: {
+        glow: true,
+        glowColor: 'rgba(187, 134, 252, 0.3)',
+        shadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+        windowShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
+        itemHover: true,
+    },
+    assets: {},
+};

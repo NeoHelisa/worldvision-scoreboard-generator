@@ -1,0 +1,48 @@
+import {ScoreboardTheme} from "../types";
+
+export const eurovisionTheme: ScoreboardTheme = {
+    id: 'eurovision',
+    name: 'Eurovision',
+    description: '',
+    colors: {
+        background: '#1a0a2e',
+        backgroundSecondary: '#16213e',
+        window: 'linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%)',
+        text: '#ffffff',
+        textSecondary: '#a0a0a0',
+        countryName: '#ffffff',
+        countryNameBg: '#2d2d5a',
+        pointsOverall: '#ffffff',
+        pointsOverallBg: '#1a1a3a',
+        pointsHighlightBg: '#e94560',
+        pointsGained: '#4ecca3',
+        border: '#e94560',
+        accent: '#e94560',
+        first: '#ffd700',
+        second: '#c0c0c0',
+        third: '#cd7f32',
+        gotPoints: '#4ecca3',
+    },
+    typography: {
+        fontPrimary: "'Poppins', sans-serif",
+        fontCountry: "'Poppins', sans-serif",
+        fontPoints: "'Roboto Mono', monospace",
+        countryNameSize: '0.85rem',
+        pointsSize: '1.1rem',
+    },
+    spacing: {
+        itemGap: '6px',
+        columnGap: '24px',
+        padding: '20px',
+        borderRadius: '4px',
+        itemHeight: '42px',
+    },
+    effects: {
+        glow: true,
+        glowColor: 'rgba(233, 69, 96, 0.5)',
+        shadow: '0 4px 30px rgba(0, 0, 0, 0.5)',
+        windowShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+        itemHover: true,
+    },
+    assets: {},
+};

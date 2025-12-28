@@ -1,0 +1,48 @@
+import {ScoreboardTheme} from "../types";
+
+export const neonTheme: ScoreboardTheme = {
+    id: 'neon',
+    name: 'Neon',
+    description: '',
+    colors: {
+        background: '#0a0a0a',
+        backgroundSecondary: '#111111',
+        window: '#0d0d0d',
+        text: '#ffffff',
+        textSecondary: '#888888',
+        countryName: '#00ffff',
+        countryNameBg: '#1a1a1a',
+        pointsOverall: '#ffffff',
+        pointsOverallBg: '#1a1a1a',
+        pointsHighlightBg: '#ff00ff',
+        pointsGained: '#00ff00',
+        border: '#ff00ff',
+        accent: '#00ffff',
+        first: '#ff00ff',
+        second: '#00ffff',
+        third: '#ff6600',
+        gotPoints: '#00ff00',
+    },
+    typography: {
+        fontPrimary: "'Orbitron', sans-serif",
+        fontCountry: "'Orbitron', sans-serif",
+        fontPoints: "'Orbitron', sans-serif",
+        countryNameSize: '0.7rem',
+        pointsSize: '1rem',
+    },
+    spacing: {
+        itemGap: '8px',
+        columnGap: '30px',
+        padding: '24px',
+        borderRadius: '0px',
+        itemHeight: '44px',
+    },
+    effects: {
+        glow: true,
+        glowColor: '#ff00ff',
+        shadow: '0 0 30px rgba(255, 0, 255, 0.3)',
+        windowShadow: '0 0 40px rgba(255, 0, 255, 0.2)',
+        itemHover: true,
+    },
+    assets: {},
+};
