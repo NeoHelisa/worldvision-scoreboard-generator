@@ -6,7 +6,6 @@ import { useScoreboardData } from '../context/ScoreboardDataContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLayout } from '../context/LayoutContext';
 import { useVotingSystem } from '../context/VotingSystemContext';
-import useConfig from '../hooks/useConfig';
 import ScoreboardWithVoter from './ScoreboardWithVoter';
 import ScoreboardRenderer from './ScoreboardRenderer';
 import { toast } from 'react-toastify';
@@ -30,7 +29,6 @@ const ScreenshotGenerator: React.FC = () => {
     const { theme } = useTheme();
     const { settings } = useLayout();
     const { votingSystem } = useVotingSystem();
-    const config = useConfig();
 
     const [progress, setProgress] = useState<GenerationProgress>({
         current: 0,
@@ -61,7 +59,6 @@ const ScreenshotGenerator: React.FC = () => {
 
     const renderAndCapture = async (
         data: NormalizedScoreEntry[],
-        title: string,
         voterCountry: string,
         currentNumber: number,
         totalCount: number,
@@ -95,7 +92,7 @@ const ScreenshotGenerator: React.FC = () => {
                 <ScoreboardWithVoter
                     data={data}
                     theme={theme}
-                    title={title}
+                    title={voterCountry}
                     voterCountry={voterCountry}
                     currentVoteNumber={currentNumber}
                     totalVoters={totalCount}
@@ -109,7 +106,7 @@ const ScreenshotGenerator: React.FC = () => {
                 <ScoreboardRenderer
                     data={data}
                     theme={theme}
-                    title={title}
+                    title={voterCountry}
                     showFlags={settings.showFlags}
                     variant={settings.variant}
                     isTelevote={isTelevote}
@@ -186,12 +183,11 @@ const ScreenshotGenerator: React.FC = () => {
                 setProgress((prev) => ({
                     ...prev,
                     current: i + 1,
-                    message: `Processing ${key}...`,
+                    message: `${voterCountry} (${key})`,
                 }));
 
                 const blob = await renderAndCapture(
                     data,
-                    voterCountry,
                     voterCountry,
                     currentNumber,
                     keysToProcess.length,
@@ -240,7 +236,7 @@ const ScreenshotGenerator: React.FC = () => {
             }));
             toast.error('Failed to generate screenshots');
         }
-    }, [scoreboards, theme, settings, votingSystem, getScoreboardKeys, config]);
+    }, [scoreboards, theme, settings, votingSystem, getScoreboardKeys]);
 
     const progressPercent =
         progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0;

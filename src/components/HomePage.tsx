@@ -9,7 +9,6 @@ import { useTheme } from '../context/ThemeContext';
 import { useLayout } from '../context/LayoutContext';
 import { useVotingSystem } from '../context/VotingSystemContext';
 import { useScoreboardData } from '../context/ScoreboardDataContext';
-import useConfig from '../hooks/useConfig';
 
 const HomePage: React.FC = () => {
     const { theme } = useTheme();
@@ -20,14 +19,11 @@ const HomePage: React.FC = () => {
         getScoreboardKeys,
         hasJuryData,
         hasTelevoteData,
-        hasModernData
+        hasModernData,
     } = useScoreboardData();
-    const config = useConfig();
 
     const [selectedPhase, setSelectedPhase] = useState<string>('jury');
     const [selectedBoardKey, setSelectedBoardKey] = useState<string>('');
-    const isTelevotePhase = selectedPhase === 'televote';
-    const isJuryPhase = selectedPhase === 'jury';
 
     const availableKeys = useMemo(() => {
         let keys: string[] = [];
@@ -58,6 +54,9 @@ const HomePage: React.FC = () => {
     const voterCountry = voterEntry?.country || 'Unknown';
 
     const currentNumber = parseInt(selectedBoardKey.replace(/\D/g, ''), 10) || 1;
+
+    const isTelevotePhase = selectedPhase === 'televote';
+    const isJuryPhase = selectedPhase === 'jury';
 
     useEffect(() => {
         if (availableKeys.length > 0 && !availableKeys.includes(selectedBoardKey)) {
@@ -96,7 +95,6 @@ const HomePage: React.FC = () => {
     const hasData = Object.keys(scoreboards).length > 0;
     const hasClassicData = hasJuryData || hasTelevoteData;
     const showClassicControls = votingSystem.id === 'classic' && hasClassicData;
-    const showModernControls = votingSystem.id === 'modern' && hasModernData;
 
     const formatKeyLabel = (key: string): string => {
         if (key.startsWith('jury_')) {

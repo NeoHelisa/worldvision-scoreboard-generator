@@ -8,9 +8,6 @@ import { retroTheme } from './presets/retro';
 
 export const themes: ScoreboardTheme[] = [
     retroTheme,
-    win98Theme,
-    neonTheme,
-    darkTheme,
 ];
 
 export const defaultTheme = win98Theme;

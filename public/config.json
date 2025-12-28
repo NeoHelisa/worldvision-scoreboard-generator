@@ -1,23 +1,4 @@
 {
-  "countryList": [
-    "Istria",
-    "Country2",
-    "Country3"
-  ],
-  "screenshotCount": 52,
-  "scoreboardRangeStart": 1,
-  "scoreboardRangeEnd": 52,
-  "serverUrl": "http://localhost:5173",
-  "viewport": { "width": 1920, "height": 1080 },
-  "scoreboardsDirectory": "/scoreboards",
-  "screenshotsDirectory": "./screenshots",
-  "showScoreboardImage": false,
   "defaultTheme": "retro",
-  "defaultVotingSystem": "modern",
-  "layoutSettings": {
-    "showVoterPanel": true,
-    "panelPosition": "left",
-    "variant": "compact",
-    "showFlags": true
-  }
+  "defaultVotingSystem": "modern"
 }

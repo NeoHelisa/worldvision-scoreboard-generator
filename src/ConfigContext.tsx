@@ -1,50 +1,49 @@
-// src/ConfigContext.tsx
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-import React, { createContext, useEffect, useState, ReactNode } from 'react';
-import { Config } from './types/Config';
+interface Config {
+  defaultTheme: string;
+  defaultVotingSystem: string;
+}
 
-export const ConfigContext = createContext<Config | null>(null);
+const defaultConfig: Config = {
+  defaultTheme: 'retro',
+  defaultVotingSystem: 'modern',
+};
+
+const ConfigContext = createContext<Config>(defaultConfig);
 
 interface ConfigProviderProps {
   children: ReactNode;
 }
 
 export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
-  const [config, setConfig] = useState<Config | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<boolean>(false);
+  const [config, setConfig] = useState<Config>(defaultConfig);
 
   useEffect(() => {
-    const fetchConfig = async () => {
+    const loadConfig = async () => {
       try {
         const response = await fetch('/config.json');
-        if (!response.ok) {
-          throw new Error('Failed to fetch config.json');
+        if (response.ok) {
+          const data = await response.json();
+          setConfig({ ...defaultConfig, ...data });
         }
-        const data: Config = await response.json();
-        setConfig(data);
-        setLoading(false);
       } catch (err) {
-        console.error('Error loading config:', err);
-        setError(true);
-        setLoading(false);
+        console.warn('Could not load config.json, using defaults');
       }
     };
 
-    fetchConfig();
+    loadConfig();
   }, []);
 
-  if (loading) {
-    return <div>Loading configuration...</div>;
-  }
-
-  if (error || !config) {
-    return <div>Error loading configuration.</div>;
-  }
-
   return (
-    <ConfigContext.Provider value={config}>
-      {children}
-    </ConfigContext.Provider>
+      <ConfigContext.Provider value={config}>
+        {children}
+      </ConfigContext.Provider>
   );
 };
+
+export const useConfig = (): Config => {
+  return useContext(ConfigContext);
+};
+
+export default ConfigContext;

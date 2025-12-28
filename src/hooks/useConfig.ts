@@ -1,15 +1,8 @@
-// src/hooks/useConfig.ts
-
 import { useContext } from 'react';
-import { ConfigContext } from '../ConfigContext';
-import { Config } from '../types/Config';
+import ConfigContext from '../ConfigContext';
 
-const useConfig = (): Config => {
-  const context = useContext(ConfigContext);
-  if (!context) {
-    throw new Error('useConfig must be used within a ConfigProvider');
-  }
-  return context;
+const useConfig = () => {
+  return useContext(ConfigContext);
 };
 
 export default useConfig;
