@@ -9,7 +9,7 @@ import { useVotingSystem } from '../context/VotingSystemContext';
 import ScoreboardWithVoter from './ScoreboardWithVoter';
 import ScoreboardRenderer from './ScoreboardRenderer';
 import { toast } from 'react-toastify';
-import { NormalizedScoreEntry } from '../types/ScoreEntry';
+import {getVoterEntry, NormalizedScoreEntry} from '../types/ScoreEntry';
 
 interface GenerationProgress {
     current: number;
@@ -174,7 +174,7 @@ const ScreenshotGenerator: React.FC = () => {
                 const key = keysToProcess[i];
                 const data = scoreboards[key];
 
-                const voterEntry = data.find((e) => e.isVoter);
+                const voterEntry = getVoterEntry(data);
                 const voterCountry = voterEntry?.country || 'Unknown';
                 const currentNumber = parseInt(key.replace(/\D/g, ''), 10) || (i + 1);
                 const isTelevote = key.startsWith('televote_');

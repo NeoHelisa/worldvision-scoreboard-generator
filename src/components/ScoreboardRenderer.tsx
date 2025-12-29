@@ -1,5 +1,5 @@
 import React from 'react';
-import { NormalizedScoreEntry } from '../types/ScoreEntry';
+import { NormalizedScoreEntry, getScoreboardEntries } from '../types/ScoreEntry';
 import { ScoreboardTheme } from '../themes/types';
 import ScoreEntryItem, { ScoreEntryVariant } from './ScoreEntryItem';
 
@@ -26,9 +26,11 @@ const ScoreboardRenderer: React.FC<ScoreboardRendererProps> = ({
                                                                    isTelevote = false,
                                                                    isJury = false,
                                                                }) => {
-    const midpoint = Math.ceil(data.length / 2);
-    const leftColumn = data.slice(0, midpoint);
-    const rightColumn = data.slice(midpoint);
+    const scoreboardData = getScoreboardEntries(data);
+
+    const midpoint = Math.ceil(scoreboardData.length / 2);
+    const leftColumn = scoreboardData.slice(0, midpoint);
+    const rightColumn = scoreboardData.slice(midpoint);
 
     const hasWindowFrame = !!theme.assets.windowFrame;
 
@@ -73,20 +75,6 @@ const ScoreboardRenderer: React.FC<ScoreboardRendererProps> = ({
             position: 'relative',
         };
 
-    const titleStyle: React.CSSProperties = {
-        margin: 0,
-        fontSize: '14px',
-        lineHeight: 1.375,
-        position: 'absolute',
-        top: '3%',
-        left: '6%',
-        fontFamily: theme.typography.fontCountry,
-        fontWeight: 700,
-        textTransform: 'capitalize',
-        color: 'transparent',
-        textShadow: '0 0 1.75px rgba(255, 255, 255, 0.98)',
-    };
-
     const gridStyle: React.CSSProperties = {
         display: 'flex',
         gap: theme.spacing.columnGap,
@@ -118,7 +106,6 @@ const ScoreboardRenderer: React.FC<ScoreboardRendererProps> = ({
 
     return (
         <div style={windowStyle}>
-
             <div style={gridStyle}>
                 <div style={columnStyle}>
                     {leftColumn.map((entry, index) => (

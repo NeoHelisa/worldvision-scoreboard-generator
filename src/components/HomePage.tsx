@@ -9,6 +9,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useLayout } from '../context/LayoutContext';
 import { useVotingSystem } from '../context/VotingSystemContext';
 import { useScoreboardData } from '../context/ScoreboardDataContext';
+import {getVoterEntry} from "../types/ScoreEntry";
 
 const HomePage: React.FC = () => {
     const { theme } = useTheme();
@@ -50,7 +51,7 @@ const HomePage: React.FC = () => {
         return scoreboards[selectedBoardKey] || null;
     }, [selectedBoardKey, scoreboards]);
 
-    const voterEntry = previewData?.find((entry) => entry.isVoter);
+    const voterEntry = previewData ? getVoterEntry(previewData) : undefined;
     const voterCountry = voterEntry?.country || 'Unknown';
 
     const currentNumber = parseInt(selectedBoardKey.replace(/\D/g, ''), 10) || 1;
