@@ -9,7 +9,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useLayout } from '../context/LayoutContext';
 import { useVotingSystem } from '../context/VotingSystemContext';
 import { useScoreboardData } from '../context/ScoreboardDataContext';
-import {getVoterEntry} from "../types/ScoreEntry";
+import { getVoterEntry } from '../types/ScoreEntry';
 
 const HomePage: React.FC = () => {
     const { theme } = useTheme();
@@ -18,6 +18,7 @@ const HomePage: React.FC = () => {
     const {
         scoreboards,
         getScoreboardKeys,
+        getRevealedCountries,
         hasJuryData,
         hasTelevoteData,
         hasModernData,
@@ -58,6 +59,11 @@ const HomePage: React.FC = () => {
 
     const isTelevotePhase = selectedPhase === 'televote';
     const isJuryPhase = selectedPhase === 'jury';
+
+    const revealedCountries = useMemo(() => {
+        if (!isTelevotePhase) return [];
+        return getRevealedCountries(selectedBoardKey);
+    }, [isTelevotePhase, selectedBoardKey, getRevealedCountries]);
 
     useEffect(() => {
         if (availableKeys.length > 0 && !availableKeys.includes(selectedBoardKey)) {
@@ -162,28 +168,38 @@ const HomePage: React.FC = () => {
                             Show Voter Panel
                         </label>
                         {settings.showVoterPanel && (
-                            <div className="panel-position">
+                            <>
+                                <div className="panel-position">
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="panelPosition"
+                                            value="left"
+                                            checked={settings.panelPosition === 'left'}
+                                            onChange={() => updateSettings({ panelPosition: 'left' })}
+                                        />
+                                        Left
+                                    </label>
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="panelPosition"
+                                            value="right"
+                                            checked={settings.panelPosition === 'right'}
+                                            onChange={() => updateSettings({ panelPosition: 'right' })}
+                                        />
+                                        Right
+                                    </label>
+                                </div>
                                 <label>
                                     <input
-                                        type="radio"
-                                        name="panelPosition"
-                                        value="left"
-                                        checked={settings.panelPosition === 'left'}
-                                        onChange={() => updateSettings({ panelPosition: 'left' })}
+                                        type="checkbox"
+                                        checked={settings.showVoterImages}
+                                        onChange={(e) => updateSettings({ showVoterImages: e.target.checked })}
                                     />
-                                    Left
+                                    Show Voter Images
                                 </label>
-                                <label>
-                                    <input
-                                        type="radio"
-                                        name="panelPosition"
-                                        value="right"
-                                        checked={settings.panelPosition === 'right'}
-                                        onChange={() => updateSettings({ panelPosition: 'right' })}
-                                    />
-                                    Right
-                                </label>
-                            </div>
+                            </>
                         )}
                     </div>
                 </div>
@@ -250,6 +266,8 @@ const HomePage: React.FC = () => {
                                     showFlags={settings.showFlags}
                                     isTelevote={isTelevotePhase}
                                     isJury={isJuryPhase}
+                                    revealedCountries={revealedCountries}
+                                    showVoterImages={settings.showVoterImages}
                                 />
                             ) : (
                                 <ScoreboardRenderer
@@ -260,6 +278,7 @@ const HomePage: React.FC = () => {
                                     showFlags={settings.showFlags}
                                     isTelevote={isTelevotePhase}
                                     isJury={isJuryPhase}
+                                    revealedCountries={revealedCountries}
                                 />
                             )}
                         </div>

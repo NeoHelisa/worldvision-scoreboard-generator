@@ -13,6 +13,7 @@ interface ScoreboardRendererProps {
     variant?: ScoreEntryVariant;
     isTelevote?: boolean;
     isJury?: boolean;
+    revealedCountries?: string[];
 }
 
 const ScoreboardRenderer: React.FC<ScoreboardRendererProps> = ({
@@ -25,6 +26,7 @@ const ScoreboardRenderer: React.FC<ScoreboardRendererProps> = ({
                                                                    variant = 'default',
                                                                    isTelevote = false,
                                                                    isJury = false,
+                                                                   revealedCountries = [],
                                                                }) => {
     const scoreboardData = getScoreboardEntries(data);
 
@@ -33,6 +35,12 @@ const ScoreboardRenderer: React.FC<ScoreboardRendererProps> = ({
     const rightColumn = scoreboardData.slice(midpoint);
 
     const hasWindowFrame = !!theme.assets.windowFrame;
+
+    const isCountryRevealed = (country: string): boolean => {
+        return revealedCountries.some(
+            (c) => c.toLowerCase() === country.toLowerCase()
+        );
+    };
 
     const windowStyle: React.CSSProperties = standalone
         ? {
@@ -104,34 +112,31 @@ const ScoreboardRenderer: React.FC<ScoreboardRendererProps> = ({
         textShadow: '0 0 1.65px rgba(0, 0, 0, 0.98)',
     };
 
+    const renderEntry = (entry: NormalizedScoreEntry, index: number) => {
+        const hasReceivedTelevote = isTelevote && isCountryRevealed(entry.country);
+
+        return (
+            <ScoreEntryItem
+                key={`${entry.country}-${index}`}
+                entry={entry}
+                theme={theme}
+                showFlags={showFlags}
+                variant={variant}
+                isTelevote={isTelevote}
+                isJury={isJury}
+                hasReceivedTelevote={hasReceivedTelevote}
+            />
+        );
+    };
+
     return (
         <div style={windowStyle}>
             <div style={gridStyle}>
                 <div style={columnStyle}>
-                    {leftColumn.map((entry, index) => (
-                        <ScoreEntryItem
-                            key={`${entry.country}-${index}`}
-                            entry={entry}
-                            theme={theme}
-                            showFlags={showFlags}
-                            variant={variant}
-                            isTelevote={isTelevote}
-                            isJury={isJury}
-                        />
-                    ))}
+                    {leftColumn.map((entry, index) => renderEntry(entry, index))}
                 </div>
                 <div style={columnStyle}>
-                    {rightColumn.map((entry, index) => (
-                        <ScoreEntryItem
-                            key={`${entry.country}-${index}`}
-                            entry={entry}
-                            theme={theme}
-                            showFlags={showFlags}
-                            variant={variant}
-                            isTelevote={isTelevote}
-                            isJury={isJury}
-                        />
-                    ))}
+                    {rightColumn.map((entry, index) => renderEntry(entry, index + midpoint))}
                 </div>
             </div>
 

@@ -22,6 +22,7 @@ export const darkTheme: ScoreboardTheme = {
         second: '#a0a0a0',
         third: '#cd7f32',
         gotPoints: '#03dac6',
+        pointsHighlightText: ""
     },
     typography: {
         fontPrimary: "'Roboto', sans-serif",

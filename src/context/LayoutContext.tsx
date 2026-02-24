@@ -6,6 +6,7 @@ export interface LayoutSettings {
     panelPosition: 'left' | 'right';
     variant: ScoreEntryVariant;
     showFlags: boolean;
+    showVoterImages: boolean;
 }
 
 interface LayoutContextValue {
@@ -18,6 +19,7 @@ const defaultSettings: LayoutSettings = {
     panelPosition: 'left',
     variant: 'compact',
     showFlags: true,
+    showVoterImages: true,
 };
 
 const LayoutContext = createContext<LayoutContextValue | null>(null);
@@ -83,6 +85,9 @@ export const parseLayoutFromURL = (searchParams: URLSearchParams): Partial<Layou
     if (searchParams.has('showFlags')) {
         result.showFlags = searchParams.get('showFlags') === 'true';
     }
+    if (searchParams.has('showVoterImages')) {
+        result.showVoterImages = searchParams.get('showVoterImages') === 'true';
+    }
 
     return result;
 };
@@ -93,5 +98,6 @@ export const buildLayoutURLParams = (settings: LayoutSettings): string => {
     params.set('panelPosition', settings.panelPosition);
     params.set('variant', settings.variant);
     params.set('showFlags', String(settings.showFlags));
+    params.set('showVoterImages', String(settings.showVoterImages));
     return params.toString();
 };

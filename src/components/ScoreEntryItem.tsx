@@ -12,16 +12,23 @@ interface ScoreEntryItemProps {
     variant?: ScoreEntryVariant;
     isTelevote?: boolean;
     isJury?: boolean;
+    hasReceivedTelevote?: boolean;
 }
 
-const JURY_POINT_COLORS: Record<number, string> = {
+const DEFAULT_POINT_COLORS: Record<number, string> = {
     1: '#82b7ca',
+    2: '#6fa8dc',
     3: '#72a175',
+    4: '#93c47d',
     5: '#c26c02',
+    6: '#e69138',
     7: '#ff0000',
+    8: '#cc0000',
+    10: '#9900ff',
+    12: '#ff00ff',
 };
 
-const GOLDEN_COLOR = '#DAA520';
+const DEFAULT_TELEVOTE_COLOR = '#DAA520';
 
 const ScoreEntryItem: React.FC<ScoreEntryItemProps> = ({
                                                            entry,
@@ -30,6 +37,7 @@ const ScoreEntryItem: React.FC<ScoreEntryItemProps> = ({
                                                            variant = 'default',
                                                            isTelevote = false,
                                                            isJury = false,
+                                                           hasReceivedTelevote = false,
                                                        }) => {
     const shouldLoadFlag = showFlags && variant !== 'compact';
     const countryKey = formatCountryForPath(entry.country);
@@ -39,18 +47,59 @@ const ScoreEntryItem: React.FC<ScoreEntryItemProps> = ({
     const isHighlighted = entry.pointsGained >= 8;
     const gotPoints = entry.pointsGained >= 1 && entry.pointsGained <= 7;
 
-    const hasReceivedTelevote = isTelevote && hasPoints;
+    const showGoldenHighlight = isTelevote && (hasPoints || hasReceivedTelevote);
+
+    const getPointColor = (points: number): string => {
+        const themeColors: Record<number, string | undefined> = {
+            1: theme.colors.points1,
+            2: theme.colors.points2,
+            3: theme.colors.points3,
+            4: theme.colors.points4,
+            5: theme.colors.points5,
+            6: theme.colors.points6,
+            7: theme.colors.points7,
+            8: theme.colors.points8,
+            10: theme.colors.points10,
+            12: theme.colors.points12,
+        };
+
+        return themeColors[points] || DEFAULT_POINT_COLORS[points] || theme.colors.pointsGainedBg || '#ff0000';
+    };
+
+    const getTelevoteColor = (): string => {
+        return theme.colors.televoteHighlight || DEFAULT_TELEVOTE_COLOR;
+    };
+
+    const getTelevoteTextColor = (): string => {
+        return theme.colors.televoteHighlightText || '#ffffff';
+    };
 
     const getPointsBubbleColor = (): string => {
         if (isTelevote && hasPoints) {
-            return GOLDEN_COLOR;
+            return getTelevoteColor();
         }
 
         if (isJury && hasPoints) {
-            return JURY_POINT_COLORS[entry.pointsGained] || theme.colors.pointsGainedBg || '#ff0000';
+            return getPointColor(entry.pointsGained);
+        }
+
+        if (hasPoints) {
+            return getPointColor(entry.pointsGained);
         }
 
         return theme.colors.pointsGainedBg || '#ff0000';
+    };
+
+    const getPointsBubbleTextColor = (): string => {
+        if (isTelevote && hasPoints) {
+            return getTelevoteTextColor();
+        }
+
+        if ((isJury || hasPoints) && theme.colors.pointsBubbleText) {
+            return theme.colors.pointsBubbleText;
+        }
+
+        return theme.colors.pointsGained || '#ffffff';
     };
 
     const containerStyle: React.CSSProperties = {
@@ -90,7 +139,7 @@ const ScoreEntryItem: React.FC<ScoreEntryItemProps> = ({
     };
 
     const pointsOverallStyle: React.CSSProperties = {
-        fontFamily: theme.typography.fontCountry,
+        fontFamily: theme.typography.fontPoints,
         fontSize: theme.typography.pointsSize,
         fontWeight: 700,
         width: '50px',
@@ -100,31 +149,37 @@ const ScoreEntryItem: React.FC<ScoreEntryItemProps> = ({
         justifyContent: 'center',
         alignItems: 'center',
         height: '100%',
-        padding: '8px 3px 3px',
+        padding: '3px',
         margin: 0,
     };
 
     const getPointsOverallStyle = (): React.CSSProperties => {
         const hasReceivedPoints = isHighlighted || gotPoints;
 
-        if (hasReceivedTelevote) {
+        if (showGoldenHighlight) {
             return {
                 ...pointsOverallStyle,
-                color: '#ffffff',
-                backgroundColor: GOLDEN_COLOR,
-                border: `1px solid ${GOLDEN_COLOR}`,
+                color: getTelevoteTextColor(),
+                backgroundColor: getTelevoteColor(),
+                border: `1px solid ${getTelevoteColor()}`,
+                borderRadius: theme.spacing.borderRadius,
+            };
+        }
+
+        if (hasReceivedPoints) {
+            return {
+                ...pointsOverallStyle,
+                color: theme.colors.pointsHighlightText || '#ffffff',
+                backgroundColor: theme.colors.pointsHighlightBg,
+                border: `1px solid ${theme.colors.border}`,
                 borderRadius: theme.spacing.borderRadius,
             };
         }
 
         return {
             ...pointsOverallStyle,
-            color: hasReceivedPoints
-                ? (theme.colors.pointsHighlightText || '#ffffff')
-                : theme.colors.pointsOverall,
-            backgroundColor: hasReceivedPoints
-                ? theme.colors.pointsHighlightBg
-                : theme.colors.pointsOverallBg,
+            color: theme.colors.pointsOverall,
+            backgroundColor: theme.colors.pointsOverallBg,
             border: `1px solid ${theme.colors.border}`,
             borderRadius: theme.spacing.borderRadius,
         };
@@ -140,7 +195,8 @@ const ScoreEntryItem: React.FC<ScoreEntryItemProps> = ({
 
     const getPointsGainedStyle = (): React.CSSProperties => {
         const bubbleColor = getPointsBubbleColor();
-        const hasBubbleBg = !!theme.colors.pointsGainedBg || isJury || isTelevote;
+        const bubbleTextColor = getPointsBubbleTextColor();
+        const hasBubbleBg = !!theme.colors.pointsGainedBg || isJury || isTelevote || hasPoints;
         const isLargeNumber = entry.pointsGained >= 100;
         const isMediumNumber = entry.pointsGained >= 10;
 
@@ -160,12 +216,13 @@ const ScoreEntryItem: React.FC<ScoreEntryItemProps> = ({
             justifyContent: 'center',
             alignItems: 'center',
             margin: 0,
-            color: '#ffffff',
+            color: bubbleTextColor,
             backgroundColor: hasPoints ? bubbleColor : 'transparent',
             borderRadius: hasBubbleBg ? '50%' : theme.spacing.borderRadius,
-            width: '1.75rem',
-            height: '1.75rem',
+            width: '100%',
+            height: '100%',
             minWidth: '1.75rem',
+            aspectRatio: '1/1',
             padding: 0,
         };
     };

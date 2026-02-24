@@ -11,15 +11,28 @@ export interface ThemeColors {
     pointsHighlightBg: string;
     pointsHighlightText: string;
     pointsGained: string;
-    pointsGainedBg?: string;
+    pointsGainedBg: string;
     border: string;
     accent: string;
-    first: string;
-    second: string;
-    third: string;
-    gotPoints: string;
+    first?: string;
+    second?: string;
+    third?: string;
+    gotPoints?: string;
     imagePlaceholderBg?: string;
     imagePlaceholderText?: string;
+    points1?: string;
+    points2?: string;
+    points3?: string;
+    points4?: string;
+    points5?: string;
+    points6?: string;
+    points7?: string;
+    points8?: string;
+    points10?: string;
+    points12?: string;
+    pointsBubbleText?: string;
+    televoteHighlight?: string;
+    televoteHighlightText?: string;
 }
 
 export interface ThemeTypography {
@@ -34,6 +47,7 @@ export interface ThemeTypography {
     voterCountrySize?: string;
     voterLabelSize?: string;
     pointsBubbleSize?: string;
+    voteCounterSize?: string;
 }
 
 export interface ThemeSpacing {
@@ -55,6 +69,7 @@ export interface ThemeEffects {
 export interface ThemeAssets {
     backgroundImage?: string;
     windowFrame?: string;
+    logo?: string;
 }
 
 export interface ScoreboardTheme {

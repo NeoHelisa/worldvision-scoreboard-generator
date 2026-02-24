@@ -9,7 +9,7 @@ import { useVotingSystem } from '../context/VotingSystemContext';
 import ScoreboardWithVoter from './ScoreboardWithVoter';
 import ScoreboardRenderer from './ScoreboardRenderer';
 import { toast } from 'react-toastify';
-import {getVoterEntry, NormalizedScoreEntry} from '../types/ScoreEntry';
+import { NormalizedScoreEntry, getVoterEntry } from '../types/ScoreEntry';
 
 interface GenerationProgress {
     current: number;
@@ -25,7 +25,7 @@ const SCREENSHOT_CONFIG = {
 };
 
 const ScreenshotGenerator: React.FC = () => {
-    const { scoreboards, getScoreboardKeys } = useScoreboardData();
+    const { scoreboards, getScoreboardKeys, getRevealedCountries } = useScoreboardData();
     const { theme } = useTheme();
     const { settings } = useLayout();
     const { votingSystem } = useVotingSystem();
@@ -63,7 +63,8 @@ const ScreenshotGenerator: React.FC = () => {
         currentNumber: number,
         totalCount: number,
         isTelevote: boolean = false,
-        isJury: boolean = false
+        isJury: boolean = false,
+        revealedCountries: string[] = []
     ): Promise<Blob> => {
         return new Promise((resolve, reject) => {
             if (!renderContainerRef.current) {
@@ -101,6 +102,8 @@ const ScreenshotGenerator: React.FC = () => {
                     variant={settings.variant}
                     isTelevote={isTelevote}
                     isJury={isJury}
+                    revealedCountries={revealedCountries}
+                    showVoterImages={settings.showVoterImages}
                 />
             ) : (
                 <ScoreboardRenderer
@@ -111,6 +114,7 @@ const ScreenshotGenerator: React.FC = () => {
                     variant={settings.variant}
                     isTelevote={isTelevote}
                     isJury={isJury}
+                    revealedCountries={revealedCountries}
                 />
             );
 
@@ -179,6 +183,7 @@ const ScreenshotGenerator: React.FC = () => {
                 const currentNumber = parseInt(key.replace(/\D/g, ''), 10) || (i + 1);
                 const isTelevote = key.startsWith('televote_');
                 const isJury = key.startsWith('jury_');
+                const revealedCountries = isTelevote ? getRevealedCountries(key) : [];
 
                 setProgress((prev) => ({
                     ...prev,
@@ -192,7 +197,8 @@ const ScreenshotGenerator: React.FC = () => {
                     currentNumber,
                     keysToProcess.length,
                     isTelevote,
-                    isJury
+                    isJury,
+                    revealedCountries
                 );
 
                 const filename = `${key}.png`;
@@ -236,7 +242,7 @@ const ScreenshotGenerator: React.FC = () => {
             }));
             toast.error('Failed to generate screenshots');
         }
-    }, [scoreboards, theme, settings, votingSystem, getScoreboardKeys]);
+    }, [scoreboards, theme, settings, votingSystem, getScoreboardKeys, getRevealedCountries]);
 
     const progressPercent =
         progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0;

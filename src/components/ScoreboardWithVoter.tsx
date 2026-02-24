@@ -17,6 +17,8 @@ interface ScoreboardWithVoterProps {
     variant?: ScoreEntryVariant;
     isTelevote?: boolean;
     isJury?: boolean;
+    revealedCountries?: string[];
+    showVoterImages?: boolean;
 }
 
 const ScoreboardWithVoter: React.FC<ScoreboardWithVoterProps> = ({
@@ -31,6 +33,8 @@ const ScoreboardWithVoter: React.FC<ScoreboardWithVoterProps> = ({
                                                                      variant = 'default',
                                                                      isTelevote = false,
                                                                      isJury = false,
+                                                                     revealedCountries = [],
+                                                                     showVoterImages = true,
                                                                  }) => {
     const containerStyle: React.CSSProperties = {
         display: 'flex',
@@ -57,6 +61,7 @@ const ScoreboardWithVoter: React.FC<ScoreboardWithVoterProps> = ({
                 theme={theme}
                 position={panelPosition}
                 isTelevote={isTelevote}
+                showImages={showVoterImages}
             />
             <div style={scoreboardWrapperStyle}>
                 <ScoreboardRenderer
@@ -68,6 +73,7 @@ const ScoreboardWithVoter: React.FC<ScoreboardWithVoterProps> = ({
                     variant={variant}
                     isTelevote={isTelevote}
                     isJury={isJury}
+                    revealedCountries={revealedCountries}
                 />
             </div>
         </div>

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { NormalizedScoreEntry, normalizeScoreData, ScoreEntry } from '../types/ScoreEntry';
+import { NormalizedScoreEntry, normalizeScoreData, ScoreEntry, getVoterEntry } from '../types/ScoreEntry';
 
 export interface ScoreboardCollection {
     [key: string]: NormalizedScoreEntry[];
@@ -11,6 +11,7 @@ interface ScoreboardDataContextValue {
     clearScoreboards: () => void;
     getScoreboard: (key: string) => NormalizedScoreEntry[] | null;
     getScoreboardKeys: (prefix?: string) => string[];
+    getRevealedCountries: (currentKey: string) => string[];
     totalScoreboards: number;
     hasJuryData: boolean;
     hasTelevoteData: boolean;
@@ -44,6 +45,28 @@ export const ScoreboardDataProvider: React.FC<ScoreboardDataProviderProps> = ({ 
         return keys.filter((key) => key.startsWith(prefix));
     };
 
+    const getRevealedCountries = (currentKey: string): string[] => {
+        if (!currentKey.startsWith('televote_')) {
+            return [];
+        }
+
+        const currentNum = parseInt(currentKey.replace('televote_', ''), 10);
+        const revealed: string[] = [];
+
+        for (let i = 1; i <= currentNum; i++) {
+            const key = `televote_${i}`;
+            const data = scoreboards[key];
+            if (data) {
+                const voterEntry = getVoterEntry(data);
+                if (voterEntry) {
+                    revealed.push(voterEntry.country);
+                }
+            }
+        }
+
+        return revealed;
+    };
+
     const totalScoreboards = Object.keys(scoreboards).length;
 
     const hasJuryData = Object.keys(scoreboards).some((k) => k.startsWith('jury_'));
@@ -58,6 +81,7 @@ export const ScoreboardDataProvider: React.FC<ScoreboardDataProviderProps> = ({ 
                 clearScoreboards,
                 getScoreboard,
                 getScoreboardKeys,
+                getRevealedCountries,
                 totalScoreboards,
                 hasJuryData,
                 hasTelevoteData,
@@ -88,8 +112,7 @@ export const parseCombinedScoreboardFile = (
         } else if (typeof value === 'object' && value !== null) {
             Object.entries(value).forEach(([subKey, subValue]) => {
                 if (Array.isArray(subValue)) {
-                    const fullKey = `${key}_${subKey}`;
-                    result[fullKey] = normalizeScoreData(subValue as ScoreEntry[]);
+                    result[subKey] = normalizeScoreData(subValue as ScoreEntry[]);
                 }
             });
         }

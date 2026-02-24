@@ -22,6 +22,7 @@ export const eurovisionTheme: ScoreboardTheme = {
         second: '#c0c0c0',
         third: '#cd7f32',
         gotPoints: '#4ecca3',
+        pointsHighlightText: ""
     },
     typography: {
         fontPrimary: "'Poppins', sans-serif",

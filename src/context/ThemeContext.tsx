@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { ScoreboardTheme } from '../themes/types';
+import { ScoreboardTheme } from '../themes';
 import { themes, defaultTheme, getThemeById } from '../themes';
 import useConfig from '../hooks/useConfig';
 
 interface ThemeContextValue {
     theme: ScoreboardTheme;
     setTheme: (themeId: string) => void;
+    setCustomTheme: (theme: ScoreboardTheme) => void;
     availableThemes: ScoreboardTheme[];
 }
 
@@ -23,10 +24,23 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     useEffect(() => {
         if (initialized) return;
 
-        const savedTheme = localStorage.getItem('scoreboard-theme');
+        const savedThemeId = localStorage.getItem('scoreboard-theme');
 
-        if (savedTheme) {
-            setThemeState(getThemeById(savedTheme));
+        if (savedThemeId === 'custom') {
+            const savedCustomTheme = localStorage.getItem('custom-theme');
+            if (savedCustomTheme) {
+                try {
+                    setThemeState(JSON.parse(savedCustomTheme));
+                    setInitialized(true);
+                    return;
+                } catch (e) {
+                    console.error('Failed to load custom theme');
+                }
+            }
+        }
+
+        if (savedThemeId) {
+            setThemeState(getThemeById(savedThemeId));
         } else if (config.defaultTheme) {
             setThemeState(getThemeById(config.defaultTheme));
         }
@@ -35,13 +49,34 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     }, [config.defaultTheme, initialized]);
 
     const setTheme = (themeId: string) => {
+        if (themeId === 'custom') {
+            const savedCustomTheme = localStorage.getItem('custom-theme');
+            if (savedCustomTheme) {
+                try {
+                    setThemeState(JSON.parse(savedCustomTheme));
+                    localStorage.setItem('scoreboard-theme', 'custom');
+                    return;
+                } catch (e) {
+                    console.error('Failed to load custom theme');
+                }
+            }
+            return;
+        }
+
         const newTheme = getThemeById(themeId);
         setThemeState(newTheme);
         localStorage.setItem('scoreboard-theme', themeId);
     };
 
+    const setCustomTheme = (customTheme: ScoreboardTheme) => {
+        const themeWithId = { ...customTheme, id: 'custom', name: 'Custom' };
+        localStorage.setItem('custom-theme', JSON.stringify(themeWithId));
+        localStorage.setItem('scoreboard-theme', 'custom');
+        setThemeState(themeWithId);
+    };
+
     return (
-        <ThemeContext.Provider value={{ theme, setTheme, availableThemes: themes }}>
+        <ThemeContext.Provider value={{ theme, setTheme, setCustomTheme, availableThemes: themes }}>
             {children}
         </ThemeContext.Provider>
     );

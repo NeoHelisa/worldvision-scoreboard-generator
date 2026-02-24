@@ -22,6 +22,7 @@ export const neonTheme: ScoreboardTheme = {
         second: '#00ffff',
         third: '#ff6600',
         gotPoints: '#00ff00',
+        pointsHighlightText: ""
     },
     typography: {
         fontPrimary: "'Orbitron', sans-serif",

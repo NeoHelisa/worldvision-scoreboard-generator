@@ -22,6 +22,7 @@ export const minimalTheme: ScoreboardTheme = {
         second: '#868e96',
         third: '#e67700',
         gotPoints: '#228be6',
+        pointsHighlightText: ""
     },
     typography: {
         fontPrimary: "'Inter', sans-serif",

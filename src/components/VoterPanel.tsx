@@ -9,6 +9,7 @@ interface VoterPanelProps {
     theme: ScoreboardTheme;
     position?: 'left' | 'right';
     isTelevote?: boolean;
+    showImages?: boolean;
 }
 
 const VoterPanel: React.FC<VoterPanelProps> = ({
@@ -18,12 +19,27 @@ const VoterPanel: React.FC<VoterPanelProps> = ({
                                                    theme,
                                                    position = 'left',
                                                    isTelevote = false,
+                                                   showImages = true,
                                                }) => {
     const countryKey = formatCountryForPath(countryName);
-    const voterImageSrc = useImageLoader(`/voters_images/${countryKey}`);
-    const artistImageSrc = useImageLoader(`/artists_images/${countryKey}`);
+    const voterImageSrc = useImageLoader(showImages ? `/voters_images/${countryKey}` : null);
+    const artistImageSrc = useImageLoader(showImages ? `/artists_images/${countryKey}` : null);
 
     const isTransparent = theme.colors.backgroundSecondary === 'transparent';
+    const hideImages = !showImages || (!voterImageSrc && !artistImageSrc);
+
+    const extractFontStyle = (fontString: string): { fontFamily: string; fontStyle: 'italic' | 'normal' } => {
+        const isItalic = fontString.toLowerCase().startsWith('italic ');
+        const fontFamily = isItalic ? fontString.replace(/^italic\s+/i, '') : fontString;
+        return {
+            fontFamily,
+            fontStyle: isItalic ? 'italic' : 'normal',
+        };
+    };
+
+    const voterCountryFont = extractFontStyle(theme.typography.fontVoterCountry || theme.typography.fontCountry);
+    const voterLabelFont = extractFontStyle(theme.typography.fontVoterLabel || theme.typography.fontPrimary);
+    const voteCounterFont = extractFontStyle(theme.typography.fontPoints);
 
     const panelWrapperStyle: React.CSSProperties = {
         position: 'relative',
@@ -37,7 +53,7 @@ const VoterPanel: React.FC<VoterPanelProps> = ({
         top: '10%',
         height: '80%',
         width: '2px',
-        backgroundColor: '#000000',
+        backgroundColor: theme.colors.border || '#000000',
         ...(position === 'left' ? { right: 0 } : { left: 0 }),
     };
 
@@ -47,7 +63,7 @@ const VoterPanel: React.FC<VoterPanelProps> = ({
         justifyContent: 'center',
         alignItems: 'center',
         height: '100%',
-        width: '350px',
+        width: hideImages ? '280px' : '350px',
         background: isTransparent
             ? 'transparent'
             : 'linear-gradient(130deg, rgba(0, 0, 0, 0.90), rgba(0, 0, 0, 0.5))',
@@ -57,17 +73,18 @@ const VoterPanel: React.FC<VoterPanelProps> = ({
         borderRight: isTransparent ? 'none' : `3px solid ${theme.colors.accent}`,
         boxShadow: theme.effects.glow ? `0 0 15px ${theme.effects.glowColor}` : 'none',
         padding: '30px 20px',
-        gap: '20px',
+        gap: hideImages ? '15px' : '20px',
     };
 
     const countryNameStyle: React.CSSProperties = {
         fontSize: theme.typography.voterCountrySize || '2rem',
         fontWeight: 400,
-        fontFamily: theme.typography.fontVoterCountry || theme.typography.fontCountry,
+        fontFamily: voterCountryFont.fontFamily,
+        fontStyle: voterCountryFont.fontStyle,
         color: theme.colors.text,
         textTransform: 'lowercase',
         textAlign: 'center',
-        margin: '0 0 30px',
+        margin: 0,
     };
 
     const labelStyle: React.CSSProperties = {
@@ -76,14 +93,14 @@ const VoterPanel: React.FC<VoterPanelProps> = ({
         color: theme.colors.text,
         textTransform: 'lowercase',
         letterSpacing: '2px',
-        fontFamily: theme.typography.fontVoterLabel || "'Abril Display', Georgia, serif",
-        fontStyle: 'italic',
-        marginBottom: '20px',
-        textAlign: 'center'
+        fontFamily: voterLabelFont.fontFamily,
+        fontStyle: voterLabelFont.fontStyle,
+        textAlign: 'center',
     };
 
     const imageContainerStyle: React.CSSProperties = {
         width: '200px',
+        height: '200px',
         borderRadius: theme.spacing.borderRadius,
         overflow: 'hidden',
         display: 'flex',
@@ -99,19 +116,20 @@ const VoterPanel: React.FC<VoterPanelProps> = ({
     };
 
     const placeholderStyle: React.CSSProperties = {
-        fontFamily: '"Abril Display", Georgia, serif',
-        fontSize: '20rem',
+        fontFamily: theme.typography.fontPrimary,
+        fontSize: '5rem',
         fontWeight: 600,
         fontStyle: 'italic',
-        color: '#000000',
+        color: theme.colors.imagePlaceholderText || '#000000',
         userSelect: 'none',
     };
 
     const voteCountStyle: React.CSSProperties = {
-        fontSize: '1.5rem',
+        fontSize: theme.typography.voteCounterSize || '1.5rem',
         fontWeight: 700,
         color: theme.colors.text,
-        fontFamily: theme.typography.fontPoints,
+        fontFamily: voteCounterFont.fontFamily,
+        fontStyle: voteCounterFont.fontStyle,
         letterSpacing: '-1px',
     };
 
@@ -125,18 +143,22 @@ const VoterPanel: React.FC<VoterPanelProps> = ({
 
                 <span style={labelStyle}>{labelText}</span>
 
-                <div style={imageContainerStyle}>
-                    {showVoterPlaceholder ? (
-                        <span style={placeholderStyle}>?</span>
-                    ) : (
-                        <img src={voterImageSrc} alt={`${countryName} voter`} style={imageStyle} />
-                    )}
-                </div>
+                {showImages && !hideImages && (
+                    <>
+                        <div style={imageContainerStyle}>
+                            {showVoterPlaceholder ? (
+                                <span style={placeholderStyle}>?</span>
+                            ) : (
+                                <img src={voterImageSrc} alt={`${countryName} voter`} style={imageStyle} />
+                            )}
+                        </div>
 
-                {artistImageSrc && (
-                    <div style={imageContainerStyle}>
-                        <img src={artistImageSrc} alt={`${countryName} artist`} style={imageStyle} />
-                    </div>
+                        {artistImageSrc && (
+                            <div style={imageContainerStyle}>
+                                <img src={artistImageSrc} alt={`${countryName} artist`} style={imageStyle} />
+                            </div>
+                        )}
+                    </>
                 )}
 
                 <span style={voteCountStyle}>

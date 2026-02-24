@@ -48,7 +48,6 @@ export const win98Theme: ScoreboardTheme = {
     },
     assets: {
         backgroundImage: '/background.png',
-        windowFrame: '/background_98.png',
-        taskbar: '/taskbar.png',
+        windowFrame: '/background_98.png'
     },
 };
