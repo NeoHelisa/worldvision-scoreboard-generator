@@ -341,9 +341,15 @@ const ThemeEditor: React.FC<ThemeEditorProps> = ({
     }> = ({ label, assetKey, placeholder, description }) => {
         const value = customTheme.assets[assetKey] || '';
         const [localValue, setLocalValue] = useState(value);
+        const [inputType, setInputType] = useState<'local' | 'url'>(
+            value.startsWith('http://') || value.startsWith('https://') ? 'url' : 'local'
+        );
 
         useEffect(() => {
             setLocalValue(value);
+            setInputType(
+                value.startsWith('http://') || value.startsWith('https://') ? 'url' : 'local'
+            );
         }, [value]);
 
         const handleBlur = () => {
@@ -356,30 +362,98 @@ const ThemeEditor: React.FC<ThemeEditorProps> = ({
             }
         };
 
+        const isValidUrl = (str: string): boolean => {
+            if (!str) return true;
+            if (str.startsWith('/')) return true;
+            try {
+                new URL(str);
+                return true;
+            } catch {
+                return false;
+            }
+        };
+
+        const isValid = isValidUrl(localValue);
+
         return (
-            <div className="editor-field">
+            <div className="editor-field asset-field">
                 <label>
                     <span className="field-label">{label}</span>
                     {description && <span className="field-description">{description}</span>}
                 </label>
+
+                <div className="asset-type-toggle">
+                    <button
+                        type="button"
+                        className={inputType === 'local' ? 'active' : ''}
+                        onClick={() => {
+                            setInputType('local');
+                            if (localValue.startsWith('http')) {
+                                setLocalValue('');
+                            }
+                        }}
+                    >
+                        Local File
+                    </button>
+                    <button
+                        type="button"
+                        className={inputType === 'url' ? 'active' : ''}
+                        onClick={() => {
+                            setInputType('url');
+                            if (localValue.startsWith('/')) {
+                                setLocalValue('');
+                            }
+                        }}
+                    >
+                        External URL
+                    </button>
+                </div>
+
                 <input
                     type="text"
                     value={localValue}
                     onChange={(e) => setLocalValue(e.target.value)}
                     onBlur={handleBlur}
                     onKeyDown={handleKeyDown}
-                    placeholder={placeholder}
+                    placeholder={
+                        inputType === 'local'
+                            ? '/backgrounds/image.png'
+                            : 'https://example.com/image.png'
+                    }
+                    className={!isValid ? 'invalid' : ''}
                 />
+
+                {!isValid && (
+                    <span className="field-error">Please enter a valid URL or local path</span>
+                )}
+
                 {localValue && (
-                    <button
-                        className="clear-btn"
-                        onClick={() => {
-                            setLocalValue('');
-                            updateAssets(assetKey, '');
-                        }}
-                    >
-                        Clear
-                    </button>
+                    <div className="asset-actions">
+                        {isValid && (localValue.startsWith('http') || localValue.startsWith('/')) && (
+                            <div className="asset-preview">
+                                <img
+                                    src={localValue}
+                                    alt="Preview"
+                                    onError={(e) => {
+                                        (e.target as HTMLImageElement).style.display = 'none';
+                                    }}
+                                    onLoad={(e) => {
+                                        (e.target as HTMLImageElement).style.display = 'block';
+                                    }}
+                                />
+                            </div>
+                        )}
+                        <button
+                            type="button"
+                            className="clear-btn"
+                            onClick={() => {
+                                setLocalValue('');
+                                updateAssets(assetKey, '');
+                            }}
+                        >
+                            Clear
+                        </button>
+                    </div>
                 )}
             </div>
         );
@@ -601,23 +675,26 @@ const ThemeEditor: React.FC<ThemeEditorProps> = ({
                             <AssetInput
                                 label="Background Image"
                                 assetKey="backgroundImage"
-                                placeholder="/backgrounds/your_image.png"
-                                description="Path to background image"
+                                description="Background image for the scoreboard"
                             />
                             <AssetInput
                                 label="Window Frame"
                                 assetKey="windowFrame"
-                                placeholder="/frames/frame.png"
-                                description="Optional window frame image"
+                                description="Optional window frame overlay"
                             />
 
                             <div className="asset-hint">
-                                <p>📁 Place images in:</p>
+                                <p>📁 <strong>Local Files:</strong></p>
                                 <ul>
-                                    <li><code>public/backgrounds/</code> for background images</li>
-                                    <li><code>public/frames/</code> for window frames</li>
+                                    <li>Place images in <code>public/backgrounds/</code> or <code>public/frames/</code></li>
+                                    <li>Reference as <code>/backgrounds/filename.png</code></li>
                                 </ul>
-                                <p>Then reference them as <code>/backgrounds/filename.png</code></p>
+                                <p>🌐 <strong>External URLs:</strong></p>
+                                <ul>
+                                    <li>Use full URL: <code>https://example.com/image.png</code></li>
+                                    <li>Make sure the image allows cross-origin access (CORS)</li>
+                                    <li>Imgur, Discord CDN, and most image hosts work</li>
+                                </ul>
                             </div>
                         </div>
                     )}
