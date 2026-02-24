@@ -37,7 +37,6 @@ const ThemeSelector: React.FC = () => {
                     <span className="theme-name">
                         {hasCustomTheme ? '✓ Custom' : '+ Custom'}
                     </span>
-                    <span className="theme-desc">Create your own theme</span>
                 </button>
             </div>
 
