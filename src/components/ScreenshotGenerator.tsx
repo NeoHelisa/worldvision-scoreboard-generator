@@ -24,6 +24,36 @@ const SCREENSHOT_CONFIG = {
     scale: 1,
 };
 
+const preloadImage = (src: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        if (!src) {
+            resolve();
+            return;
+        }
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => resolve();
+        img.onerror = () => {
+            console.warn(`Failed to preload image: ${src}`);
+            resolve();
+        };
+        img.src = src;
+    });
+};
+
+const preloadAllImages = async (theme: any): Promise<void> => {
+    const imagesToPreload: string[] = [];
+
+    if (theme.assets?.backgroundImage) {
+        imagesToPreload.push(theme.assets.backgroundImage);
+    }
+    if (theme.assets?.windowFrame) {
+        imagesToPreload.push(theme.assets.windowFrame);
+    }
+
+    await Promise.all(imagesToPreload.map(preloadImage));
+};
+
 const ScreenshotGenerator: React.FC = () => {
     const { scoreboards, getScoreboardKeys, getRevealedCountries } = useScoreboardData();
     const { theme } = useTheme();
@@ -47,6 +77,13 @@ const ScreenshotGenerator: React.FC = () => {
             allowTaint: true,
             backgroundColor: null,
             logging: false,
+            imageTimeout: 15000,
+            onclone: (clonedDoc) => {
+                const images = clonedDoc.querySelectorAll('img');
+                images.forEach((img) => {
+                    img.crossOrigin = 'anonymous';
+                });
+            },
         });
 
         return new Promise((resolve, reject) => {
@@ -75,13 +112,14 @@ const ScreenshotGenerator: React.FC = () => {
             const container = renderContainerRef.current;
             const root = createRoot(container);
 
+            const backgroundImage = theme.assets.backgroundImage;
+            const isExternalUrl = backgroundImage?.startsWith('http');
+
             const previewStyle: React.CSSProperties = {
                 width: `${SCREENSHOT_CONFIG.width}px`,
                 height: `${SCREENSHOT_CONFIG.height}px`,
-                backgroundImage: theme.assets.backgroundImage
-                    ? `url(${theme.assets.backgroundImage})`
-                    : undefined,
                 backgroundColor: theme.colors.background,
+                backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
                 backgroundSize: 'auto 100%',
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'center',
@@ -118,7 +156,34 @@ const ScreenshotGenerator: React.FC = () => {
                 />
             );
 
-            root.render(<div style={previewStyle}>{content}</div>);
+            const renderContent = (
+                <div style={previewStyle}>
+                    {backgroundImage && (
+                        <img
+                            src={backgroundImage}
+                            alt=""
+                            crossOrigin="anonymous"
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                height: '100%',
+                                width: 'auto',
+                                zIndex: 0,
+                                pointerEvents: 'none',
+                            }}
+                        />
+                    )}
+                    <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%' }}>
+                        {content}
+                    </div>
+                </div>
+            );
+
+            root.render(renderContent);
+
+            const waitTime = isExternalUrl ? 500 : 200;
 
             setTimeout(async () => {
                 try {
@@ -129,7 +194,7 @@ const ScreenshotGenerator: React.FC = () => {
                     root.unmount();
                     reject(err);
                 }
-            }, 150);
+            }, waitTime);
         });
     };
 
@@ -171,9 +236,12 @@ const ScreenshotGenerator: React.FC = () => {
             current: 0,
             total: keysToProcess.length,
             status: 'generating',
+            message: 'Preloading images...',
         });
 
         try {
+            await preloadAllImages(theme);
+
             for (let i = 0; i < keysToProcess.length; i++) {
                 const key = keysToProcess[i];
                 const data = scoreboards[key];
